@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jing — Personal Website</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #03080f;
+      --accent: #2b7cf7;
+      --accent2: #0db8d4;
+      --text: #d6e8ff;
+      --muted: #5a80a8;
+      --border: rgba(43,124,247,0.12);
+      --card-bg: rgba(255,255,255,0.03);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      cursor: none;
+    }
+
+    /* ── Custom Cursor ── */
+    #cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: width 0.25s, height 0.25s, background 0.25s;
+    }
+    #cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(43,124,247,0.45);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s, height 0.25s, border-color 0.25s;
+    }
+    body:has(a:hover) #cursor,
+    body:has(button:hover) #cursor { width: 18px; height: 18px; background: var(--accent2); }
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring { width: 54px; height: 54px; border-color: var(--accent2); }
+
+    /* ── Canvas ── */
+    #canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Glow blobs ── */
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .glow-blob.one { width: 500px; height: 500px; background: #0d3a7a; top: -150px; left: -150px; }
+    .glow-blob.two { width: 400px; height: 400px; background: #062550; bottom: -150px; right: -150px; }
+
+    /* ── Layout ── */
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      grid-template-rows: 56px 1fr;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(3,8,15,0.7);
+    }
+    .logo {
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+      cursor: none;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-tag {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(43,124,247,0.3);
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      overflow: hidden;
+    }
+
+    /* Avatar */
+    .avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
+    .avatar {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 0 32px rgba(43,124,247,0.35);
+      flex-shrink: 0;
+    }
+    .avatar-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .avatar-title {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .avatar-title strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Info rows */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      cursor: none;
+      transition: color 0.2s;
+      padding: 4px 0;
+    }
+    .info-row:hover { color: var(--text); }
+    .info-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(43,124,247,0.1);
+      border: 1px solid rgba(43,124,247,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    /* Skills */
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(43,124,247,0.08);
+      border: 1px solid rgba(43,124,247,0.18);
+      color: var(--accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Main content ── */
+    .main {
+      padding: 32px 48px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 28px;
+      overflow: hidden;
+    }
+    .main-inner {
+      max-width: 860px;
+    }
+
+    /* Bio */
+    .bio-section {}
+    .bio-label {
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .bio-title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .bio-title .grad {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bio-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      max-width: 100%;
+    }
+    .bio-cta {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .btn {
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: none;
+      text-decoration: none;
+      border: none;
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 0 24px rgba(43,124,247,0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid rgba(255,255,255,0.12);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(43,124,247,0.35); }
+
+    /* Cards row */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      align-content: start;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: none;
+    }
+    .card:hover {
+      border-color: rgba(43,124,247,0.3);
+      box-shadow: 0 12px 40px rgba(43,124,247,0.12);
+    }
+    .card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .card-desc { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 14px;
+    }
+    .tag {
+      padding: 2px 9px;
+      border-radius: 20px;
+      background: rgba(43,124,247,0.1);
+      border: 1px solid rgba(43,124,247,0.2);
+      color: var(--accent);
+      font-size: 0.68rem;
+    }
+    .card-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      text-decoration: none;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      cursor: none;
+    }
+    .card-link:hover { opacity: 1; }
+
+    /* ── Fade-in ── */
+    .fade { opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s ease forwards; }
+    .fade:nth-child(1) { animation-delay: 0.1s; }
+    .fade:nth-child(2) { animation-delay: 0.2s; }
+    .fade:nth-child(3) { animation-delay: 0.3s; }
+    .fade:nth-child(4) { animation-delay: 0.4s; }
+    .fade:nth-child(5) { animation-delay: 0.5s; }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Orbit animation for avatar */
+    @keyframes spin {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to   { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="canvas"></canvas>
+<div class="glow-blob one" id="blob1"></div>
+<div class="glow-blob two"></div>
+
+<div class="layout">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="logo">Jing · Personal Website</div>
+    <nav class="nav-links">
+      <a href="#">About</a>
+      <a href="#">CV</a>
+      <a href="#">Work</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div class="nav-tag">✦ Open to opportunities</div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <div class="avatar-wrap fade">
+      <div class="avatar">✦</div>
+      <div>
+        <div class="avatar-name">Jing</div>
+        <div class="avatar-title">
+          Developer & Designer<br>
+          <strong>New York University</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="info-list fade">
+      <a href="#" class="info-row">
+        <div class="info-icon">📍</div>New York, NY
+      </a>
+      <a href="mailto:lj2204@nyu.edu" class="info-row">
+        <div class="info-icon">✉️</div>lj2204@nyu.edu
+      </a>
+      <a href="#" class="info-row">
+        <div class="info-icon">🐙</div>GitHub
+      </a>
+      <a href="#" class="info-row">
+        <div class="info-icon">💼</div>LinkedIn
+      </a>
+      <a href="#" class="info-row">
+        <div class="info-icon">📄</div>CV / Resume
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="fade">
+      <div style="font-size:0.68rem;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Skills</div>
+      <div class="skill-chips">
+        <span class="chip">React</span>
+        <span class="chip">Next.js</span>
+        <span class="chip">Three.js</span>
+        <span class="chip">Python</span>
+        <span class="chip">Node.js</span>
+        <span class="chip">UI Design</span>
+        <span class="chip">WebGL</span>
+        <span class="chip">GSAP</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+  <div class="main-inner">
+
+    <!-- Bio -->
+    <div class="bio-section fade">
+      <div class="bio-label">About Me</div>
+      <h1 class="bio-title">
+        Building things that<br>
+        feel <span class="grad">alive on the web.</span>
+      </h1>
+      <p class="bio-text">
+        I'm a developer and designer at NYU with a passion for interactive experiences.
+        I love turning complex ideas into beautiful, animated interfaces — from data visualizations
+        to immersive 3D web apps. My work sits at the intersection of design, code, and creativity.
+      </p>
+      <div class="bio-cta">
+        <a href="#" class="btn btn-primary">View My Work</a>
+        <a href="mailto:lj2204@nyu.edu" class="btn btn-outline">Get In Touch</a>
+      </div>
+    </div>
+
+    <!-- Work cards -->
+    <div class="cards-row">
+
+      <div class="card fade" data-tilt>
+        <div class="card-icon">🌌</div>
+        <div class="card-title">Galaxy Explorer</div>
+        <p class="card-desc">Interactive 3D solar system visualization with WebGL shaders.</p>
+        <div class="card-tags">
+          <span class="tag">Three.js</span>
+          <span class="tag">WebGL</span>
+          <span class="tag">GSAP</span>
+        </div>
+        <a href="#" class="card-link">View project →</a>
+      </div>
+
+      <div class="card fade" data-tilt>
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Generative Art Studio</div>
+        <p class="card-desc">Browser-based tool for procedurally generated art with live controls.</p>
+        <div class="card-tags">
+          <span class="tag">Canvas API</span>
+          <span class="tag">React</span>
+          <span class="tag">p5.js</span>
+        </div>
+        <a href="#" class="card-link">View project →</a>
+      </div>
+
+      <div class="card fade" data-tilt>
+        <div class="card-icon">🤖</div>
+        <div class="card-title">AI Writing Assistant</div>
+        <p class="card-desc">Minimal LLM-powered writing companion with distraction-free UI.</p>
+        <div class="card-tags">
+          <span class="tag">Next.js</span>
+          <span class="tag">OpenAI</span>
+          <span class="tag">Tailwind</span>
+        </div>
+        <a href="#" class="card-link">View project →</a>
+      </div>
+
+    </div>
+
+  </div>
+  </main>
+
+</div>
+
+<script>
+  // ── Custom Cursor ──
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // ── Particle canvas ──
+  const canvas = document.getElementById('canvas');
+  const ctx    = canvas.getContext('2d');
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const COLORS = ['43,124,247', '13,184,212'];
+  const particles = Array.from({length: 70}, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    size: Math.random() * 1.4 + 0.4,
+    sx: (Math.random() - 0.5) * 0.25,
+    sy: -(Math.random() * 0.35 + 0.08),
+    op: Math.random() * 0.45 + 0.08,
+    col: COLORS[Math.random() > 0.5 ? 0 : 1]
+  }));
+
+  const trail = [];
+  document.addEventListener('mousemove', e => {
+    for (let i = 0; i < 2; i++) trail.push({
+      x: e.clientX + (Math.random()-0.5)*8,
+      y: e.clientY + (Math.random()-0.5)*8,
+      size: Math.random()*2.5+0.8,
+      op: 0.75,
+      sx: (Math.random()-0.5)*1.8,
+      sy: (Math.random()-0.5)*1.8 - 0.8,
+      col: COLORS[Math.random() > 0.5 ? 0 : 1]
+    });
+  });
+
+  (function animCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.sx; p.y += p.sy;
+      if (p.y < -5) { p.y = canvas.height + 5; p.x = Math.random() * canvas.width; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${p.col},${p.op})`;
+      ctx.fill();
+    });
+    for (let i = trail.length-1; i >= 0; i--) {
+      const t = trail[i];
+      t.x += t.sx; t.y += t.sy; t.op -= 0.028; t.size *= 0.96;
+      if (t.op <= 0) { trail.splice(i,1); continue; }
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, t.size, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${t.col},${t.op})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(animCanvas);
+  })();
+
+  // ── 3D Card Tilt ──
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r  = card.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
+      const dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
+      card.style.transform = `perspective(600px) rotateY(${dx*8}deg) rotateX(${-dy*8}deg) translateZ(8px)`;
+      card.style.boxShadow = `${-dx*16}px ${dy*16}px 40px rgba(43,124,247,0.18)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.boxShadow = '';
+    });
+  });
+
+  // ── Glow blob follows mouse ──
+  const blob1 = document.getElementById('blob1');
+  let bx = 0, by = 0, tbx = -150, tby = -150;
+  document.addEventListener('mousemove', e => { tbx = e.clientX - 250; tby = e.clientY - 250; });
+  (function animBlob() {
+    bx += (tbx - bx) * 0.04;
+    by += (tby - by) * 0.04;
+    blob1.style.transform = `translate(${bx}px, ${by}px)`;
+    requestAnimationFrame(animBlob);
+  })();
+
+  // ── Magnetic buttons ──
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r  = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top  + r.height/2);
+      btn.style.transform = `translate(${dx*0.22}px, ${dy*0.22}px) translateY(-2px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+</script>
+</body>
+</html>
