@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KPY5WHG3ET"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KPY5WHG3ET');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CV — Jing Luo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #03080f;
+      --accent: #2b7cf7;
+      --accent2: #0db8d4;
+      --text: #d6e8ff;
+      --muted: #5a80a8;
+      --border: rgba(43,124,247,0.12);
+    }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      cursor: none;
+      overflow: hidden;
+    }
+    #cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: width 0.25s, height 0.25s, background 0.25s;
+    }
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .glow-blob.one { width: 500px; height: 500px; background: #0d3a7a; top: -150px; left: -150px; }
+    .glow-blob.two { width: 400px; height: 400px; background: #062550; bottom: -150px; right: -150px; }
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 56px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(3,8,15,0.7);
+    }
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 44px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1rem;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+      cursor: none;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .pdf-wrap {
+      flex: 1;
+      padding: 24px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .pdf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pdf-title {
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    .download-btn {
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      text-decoration: none;
+      cursor: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(43,124,247,0.3);
+    }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(43,124,247,0.35); }
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div class="glow-blob one" id="blob1"></div>
+<div class="glow-blob two"></div>
+<div class="layout">
+  <header class="topbar">
+    <a href="index.html" class="logo">Jing Luo · Personal Website</a>
+    <nav class="nav-links">
+      <a href="index.html">About</a>
+      <a href="cv.html" class="active">CV</a>
+      <a href="#">Research</a>
+      <a href="#">Projects</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div></div>
+  </header>
+  <div class="pdf-wrap">
+    <div class="pdf-header">
+      <div class="pdf-title">Curriculum Vitae</div>
+      <a href="https://www.dropbox.com/scl/fi/71yecrjvb8rvbf8yhdjvw/Jing_CV.pdf?rlkey=sula9z0im9unvw7vd0e96h1qk&st=qz7kk0xk&dl=1" class="download-btn" target="_blank">Download PDF</a>
+    </div>
+    <iframe src="https://www.dropbox.com/scl/fi/71yecrjvb8rvbf8yhdjvw/Jing_CV.pdf?rlkey=sula9z0im9unvw7vd0e96h1qk&st=qz7kk0xk&raw=1" frameborder="0" allowfullscreen></iframe>
+  </div>
+</div>
+<script>
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  const blob1 = document.getElementById('blob1');
+  let bx = 0, by = 0, tbx = -150, tby = -150;
+  document.addEventListener('mousemove', e => { tbx = e.clientX - 250; tby = e.clientY - 250; });
+  (function animBlob() {
+    bx += (tbx - bx) * 0.04;
+    by += (tby - by) * 0.04;
+    blob1.style.transform = `translate(${bx}px, ${by}px)`;
+    requestAnimationFrame(animBlob);
+  })();
+</script>
+</body>
+</html>
