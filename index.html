@@ -15,9 +15,9 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg: #03080f;
-      --accent: #2b7cf7;
-      --accent2: #0db8d4;
+      --bg: #00020a;
+      --accent: #1a65d6;
+      --accent2: #0aa0b8;
       --text: #d6e8ff;
       --muted: #5a80a8;
       --border: rgba(43,124,247,0.12);
@@ -61,8 +61,8 @@
       z-index: 0;
       opacity: 0.15;
     }
-    .glow-blob.one { width: 500px; height: 500px; background: #0d3a7a; top: -150px; left: -150px; }
-    .glow-blob.two { width: 400px; height: 400px; background: #062550; bottom: -150px; right: -150px; }
+    .glow-blob.one { width: 600px; height: 600px; background: #0d1a4a; top: -200px; left: -200px; }
+    .glow-blob.two { width: 500px; height: 500px; background: #1a0a3a; bottom: -200px; right: -200px; }
     /* ── Layout ── */
     .layout {
       position: relative;
@@ -92,7 +92,7 @@
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.3px;
     }
-    .nav-links { display: flex; gap: 44px; }
+    .nav-links { display: flex; gap: 44px; margin-right: 48px; }
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
@@ -128,25 +128,23 @@
       text-align: center;
     }
     .avatar {
-      width: 90px; height: 90px;
+      width: 140px; height: 140px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      box-shadow: 0 0 32px rgba(43,124,247,0.35);
+      object-fit: cover;
+      object-position: center 2%;
+      box-shadow: 0 0 40px rgba(43,124,247,0.45);
+      border: 2px solid rgba(43,124,247,0.4);
       flex-shrink: 0;
     }
     .avatar-name {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.3px;
     }
     .avatar-title {
-      font-size: 0.78rem;
+      font-size: 0.92rem;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .avatar-title strong {
       color: var(--accent);
@@ -196,10 +194,12 @@
       padding: 4px 10px;
       border-radius: 20px;
       background: rgba(43,124,247,0.08);
-      border: 1px solid rgba(43,124,247,0.18);
-      color: var(--accent);
+      border: 1px solid rgba(77,163,255,0.25);
+      color: #4da3ff;
       font-size: 0.72rem;
       letter-spacing: 0.3px;
+      text-shadow: 0 0 8px rgba(77,163,255,0.5), 0 0 18px rgba(77,163,255,0.2);
+      box-shadow: 0 0 8px rgba(77,163,255,0.1), inset 0 0 8px rgba(77,163,255,0.04);
     }
     /* ── Main content ── */
     .main {
@@ -306,15 +306,16 @@
     }
     .card-link {
       display: inline-block;
-      margin-top: 12px;
-      color: var(--accent);
+      margin-top: 22px;
+      color: #4da3ff;
       font-size: 0.78rem;
       text-decoration: none;
-      opacity: 0.7;
-      transition: opacity 0.2s;
+      opacity: 0.8;
+      text-shadow: 0 0 10px rgba(77,163,255,0.6), 0 0 22px rgba(77,163,255,0.3);
+      transition: opacity 0.2s, text-shadow 0.2s;
       cursor: none;
     }
-    .card-link:hover { opacity: 1; }
+    .card-link:hover { opacity: 1; text-shadow: 0 0 14px rgba(77,163,255,0.9), 0 0 30px rgba(77,163,255,0.5); }
     /* ── Fade-in ── */
     .fade { opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s ease forwards; }
     .fade:nth-child(1) { animation-delay: 0.1s; }
@@ -351,7 +352,7 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="avatar-wrap fade">
-      <div class="avatar">✦</div>
+      <img class="avatar" src="photo.png" alt="Jing Luo">
       <div>
         <div class="avatar-name">Jing Luo</div>
         <div class="avatar-title">
@@ -397,11 +398,11 @@
     <div class="bio-section fade">
       <h1 class="bio-title"><span class="grad">About Me</span></h1>
       <p class="bio-text">
-        Welcome! I'm a Ph.D. candidate in the Department of Political Science at the Ohio State University. My research focuses on foreign lobbying, diplomacy, and international campaigns. My research uses various computational methods, including machine learning, large language models, neural networks, and social networks. You can find my package <a href="https://github.com/nanajing7/RAMEN" target="_blank" style="color:var(--accent);text-decoration:none;">"RAMEN"</a> on GitHub.
+        Welcome! I'm a Ph.D. candidate in the Department of Political Science at the Ohio State University. My research focuses on foreign lobbying, diplomacy, and international campaigns. My research uses various computational methods, including machine learning, large language models, neural networks, and social networks. You can find my package <a href="https://github.com/nanajing7/RAMEN" target="_blank" style="color:#4da3ff;text-decoration:none;font-weight:700;border-bottom:1.5px solid rgba(77,163,255,0.5);padding-bottom:1px;text-shadow:0 0 12px rgba(77,163,255,0.6);">RAMEN</a> on GitHub.
       </p>
       <div class="bio-cta">
         <a href="#" class="btn btn-primary">View My Work</a>
-        <a href="mailto:luo.1405@osu.edu" class="btn btn-outline">Get In Touch</a>
+        <a href="cv.html" class="btn btn-outline">CV</a>
       </div>
     </div>
     <!-- Work cards -->
@@ -409,7 +410,7 @@
       <div class="card fade" data-tilt>
         <div class="card-icon">🏛️</div>
         <div class="card-title">Foreign Lobbying</div>
-        <p class="card-desc">(1) How foreign governments lobby U.S. foreign policy;<br>(2) How foreign firms and chambers of commerce lobby in China.</p>
+        <p class="card-desc">(1) How foreign governments lobby U.S. foreign policy;<br>(2) How foreign firms and chambers of commerce lobby in China;<br>(3) Cross-national patterns in how chambers of commerce shape foreign policies.</p>
         <div class="card-tags">
           <span class="tag">Foreign Policy</span>
           <span class="tag">Lobbying</span>
@@ -420,7 +421,7 @@
       <div class="card fade" data-tilt>
         <div class="card-icon">🌐</div>
         <div class="card-title">Diplomacy & International Campaigns</div>
-        <p class="card-desc">Studies how states challenge power-based international hierarchies by leveraging diplomatic activities and international campaigns.</p>
+        <p class="card-desc">I study diplomatic activities and international campaigns, focusing on how states challenge power-based international hierarchies.</p>
         <div class="card-tags">
           <span class="tag">Diplomacy</span>
           <span class="tag">International Relations</span>
@@ -431,7 +432,7 @@
       <div class="card fade" data-tilt>
         <div class="card-icon">📺</div>
         <div class="card-title">Computational Media & Propaganda</div>
-        <p class="card-desc">Analyzes government propaganda and elite discourse via video analysis and discourse networks, using U.S. and Chinese news media data.</p>
+        <p class="card-desc">I employ large language models, neural network models, and social network analysis to study elite discourse and political propaganda based on U.S. and Chinese news media data.</p>
         <div class="card-tags">
           <span class="tag">Video Analysis</span>
           <span class="tag">Discourse Networks</span>
@@ -453,23 +454,89 @@
     cursor.style.top  = my + 'px';
   });
 
-  // ── Particle canvas ──
+  // ── Cosmic canvas ──
   const canvas = document.getElementById('canvas');
   const ctx    = canvas.getContext('2d');
-  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
-  resize(); window.addEventListener('resize', resize);
 
-  const COLORS = ['43,124,247', '13,184,212'];
-  const particles = Array.from({length: 70}, () => ({
-    x: Math.random() * innerWidth,
-    y: Math.random() * innerHeight,
-    size: Math.random() * 1.4 + 0.4,
-    sx: (Math.random() - 0.5) * 0.25,
-    sy: -(Math.random() * 0.35 + 0.08),
-    op: Math.random() * 0.45 + 0.08,
-    col: COLORS[Math.random() > 0.5 ? 0 : 1]
-  }));
+  // Nebula definitions (relative coords, recomputed on resize)
+  const NEBULA_DEF = [
+    { rx: 0.18, ry: 0.28, r: 460, col: '80,25,160',  op: 0.18 },
+    { rx: 0.72, ry: 0.62, r: 520, col: '10,50,130',  op: 0.20 },
+    { rx: 0.50, ry: 0.10, r: 340, col: '15,100,170', op: 0.14 },
+    { rx: 0.88, ry: 0.18, r: 360, col: '110,20,110', op: 0.12 },
+    { rx: 0.08, ry: 0.82, r: 340, col: '10,80,120',  op: 0.13 },
+    { rx: 0.55, ry: 0.85, r: 400, col: '60,12,120',  op: 0.11 },
+    { rx: 0.35, ry: 0.55, r: 300, col: '5,30,80',    op: 0.09 },
+  ];
 
+  // Star layers (far → near), each with parallax strength
+  const LAYER_DEF = [
+    { n: 240, minS: 0.08, maxS: 0.35, minO: 0.06, maxO: 0.30, px: 0.0008 }, // deep far
+    { n: 160, minS: 0.28, maxS: 0.75, minO: 0.18, maxO: 0.55, px: 0.003  }, // mid-far
+    { n:  80, minS: 0.65, maxS: 1.5,  minO: 0.40, maxO: 0.82, px: 0.010  }, // mid-near
+    { n:  22, minS: 1.8,  maxS: 3.4,  minO: 0.72, maxO: 1.0,  px: 0.024  }, // foreground
+  ];
+  let layers = [];
+
+  // Milky Way band — extra micro-stars along a diagonal strip
+  let mwStars = [];
+
+  function initStars() {
+    layers = LAYER_DEF.map(def => ({
+      ...def,
+      stars: Array.from({ length: def.n }, () => {
+        const r = Math.random();
+        const col = r > 0.90 ? '160,205,255'
+                  : r > 0.78 ? '255,240,190'
+                  : r > 0.70 ? '255,200,170'
+                  : '245,248,255';
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: def.minS + Math.random() * (def.maxS - def.minS),
+          baseOp: def.minO + Math.random() * (def.maxO - def.minO),
+          phase: Math.random() * Math.PI * 2,
+          twinkle: Math.random() * 1.5 + 0.2,
+          col,
+        };
+      })
+    }));
+
+    // Milky Way: stars clustered around a diagonal band
+    mwStars = Array.from({ length: 300 }, () => {
+      const t2 = Math.random();
+      const bx = t2 * canvas.width;
+      const by = canvas.height * 0.15 + t2 * canvas.height * 0.7
+                 + (Math.random() - 0.5) * canvas.height * 0.35;
+      return {
+        x: bx, y: by,
+        size: Math.random() * 0.5 + 0.1,
+        op: Math.random() * 0.28 + 0.06,
+        phase: Math.random() * Math.PI * 2,
+        twinkle: Math.random() * 0.8 + 0.1,
+      };
+    });
+  }
+
+  function resize() {
+    canvas.width  = innerWidth;
+    canvas.height = innerHeight;
+    initStars();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Mouse position (smoothed) for parallax
+  let mxRaw = innerWidth / 2, myRaw = innerHeight / 2;
+  let mxS   = mxRaw, myS = myRaw;
+  document.addEventListener('mousemove', e => { mxRaw = e.clientX; myRaw = e.clientY; });
+
+  // Shooting stars
+  const shooters = [];
+  let shootCooldown = 160;
+
+  // Mouse trail
+  const TRAIL_COLS = ['43,124,247', '13,184,212'];
   const trail = [];
   document.addEventListener('mousemove', e => {
     for (let i = 0; i < 2; i++) trail.push({
@@ -479,38 +546,150 @@
       op: 0.85,
       sx: (Math.random()-0.5)*1.8,
       sy: (Math.random()-0.5)*1.8 - 0.8,
-      col: COLORS[Math.random() > 0.5 ? 0 : 1],
+      col: TRAIL_COLS[Math.random() > 0.5 ? 0 : 1],
       rot: Math.random() * Math.PI * 2
     });
   });
 
+  // Diffraction cross for bright stars
+  function drawCross(x, y, size, op, col) {
+    const len = size * 9;
+    for (const angle of [0, Math.PI / 2]) {
+      const x0 = x - Math.cos(angle) * len, y0 = y - Math.sin(angle) * len;
+      const x1 = x + Math.cos(angle) * len, y1 = y + Math.sin(angle) * len;
+      const g = ctx.createLinearGradient(x0, y0, x1, y1);
+      g.addColorStop(0,   'rgba(255,255,255,0)');
+      g.addColorStop(0.5, `rgba(${col},${op * 0.55})`);
+      g.addColorStop(1,   'rgba(255,255,255,0)');
+      ctx.beginPath();
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+  }
+
   (function animCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const t = performance.now() * 0.001;
 
-    // Background floating particles
-    particles.forEach(p => {
-      p.x += p.sx; p.y += p.sy;
-      if (p.y < -5) { p.y = canvas.height + 5; p.x = Math.random() * canvas.width; }
+    // Smooth mouse
+    mxS += (mxRaw - mxS) * 0.05;
+    myS += (myRaw - myS) * 0.05;
+    const cx = canvas.width  / 2;
+    const cy = canvas.height / 2;
+
+    // ── Nebula clouds ──
+    NEBULA_DEF.forEach(n => {
+      const nx = n.rx * canvas.width  + Math.sin(t * 0.025 + n.rx * 8) * 18;
+      const ny = n.ry * canvas.height + Math.cos(t * 0.018 + n.ry * 8) * 18;
+      const g  = ctx.createRadialGradient(nx, ny, 0, nx, ny, n.r);
+      g.addColorStop(0,   `rgba(${n.col},${n.op})`);
+      g.addColorStop(0.5, `rgba(${n.col},${n.op * 0.4})`);
+      g.addColorStop(1,   'rgba(0,0,0,0)');
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},${p.op})`;
+      ctx.arc(nx, ny, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = g;
       ctx.fill();
     });
 
-    // Star trail
-    for (let i = trail.length-1; i >= 0; i--) {
-      const t = trail[i];
-      t.x += t.sx; t.y += t.sy;
-      t.op -= 0.025;
-      t.size *= 0.97;
-      t.rot += 0.08;
-      if (t.op <= 0) { trail.splice(i,1); continue; }
+    // ── Milky Way band ──
+    mwStars.forEach(s => {
+      const op = s.op * (0.6 + 0.4 * Math.sin(t * s.twinkle + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,215,255,${op})`;
+      ctx.fill();
+    });
+
+    // ── Star layers with parallax ──
+    layers.forEach(layer => {
+      const ox = (mxS - cx) * layer.px;
+      const oy = (myS - cy) * layer.px;
+      layer.stars.forEach(s => {
+        const op = s.baseOp * (0.55 + 0.45 * Math.sin(t * s.twinkle + s.phase));
+        const sx = s.x + ox, sy = s.y + oy;
+
+        // Outer glow for mid/near stars
+        if (s.size > 0.9) {
+          const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, s.size * 5);
+          gr.addColorStop(0, `rgba(${s.col},${op * 0.35})`);
+          gr.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath();
+          ctx.arc(sx, sy, s.size * 5, 0, Math.PI * 2);
+          ctx.fillStyle = gr;
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${s.col},${op})`;
+        ctx.fill();
+
+        // Diffraction cross for bright near stars
+        if (s.size > 1.8) drawCross(sx, sy, s.size, op, s.col);
+      });
+    });
+
+    // ── Shooting stars ──
+    shootCooldown--;
+    if (shootCooldown <= 0) {
+      shootCooldown = 160 + Math.random() * 380;
+      const angle = Math.PI / 5 + (Math.random() - 0.5) * 0.4;
+      shooters.push({
+        x: Math.random() * canvas.width * 0.8,
+        y: Math.random() * canvas.height * 0.5,
+        len: 90 + Math.random() * 130,
+        speed: 9 + Math.random() * 8,
+        op: 1, angle
+      });
+    }
+    for (let i = shooters.length - 1; i >= 0; i--) {
+      const s = shooters[i];
+      s.x += Math.cos(s.angle) * s.speed;
+      s.y += Math.sin(s.angle) * s.speed;
+      s.op -= 0.018;
+      if (s.op <= 0) { shooters.splice(i, 1); continue; }
+      const gx = ctx.createLinearGradient(
+        s.x, s.y,
+        s.x - Math.cos(s.angle) * s.len,
+        s.y - Math.sin(s.angle) * s.len);
+      gx.addColorStop(0,   `rgba(255,255,255,${s.op})`);
+      gx.addColorStop(0.25,`rgba(200,230,255,${s.op * 0.7})`);
+      gx.addColorStop(1,   'rgba(150,200,255,0)');
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(s.x - Math.cos(s.angle) * s.len, s.y - Math.sin(s.angle) * s.len);
+      ctx.strokeStyle = gx;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.op})`;
+      ctx.fill();
+    }
+
+    // ── Vignette (telescope depth) ──
+    const vDim = Math.max(canvas.width, canvas.height);
+    const vg = ctx.createRadialGradient(cx, cy, vDim * 0.18, cx, cy, vDim * 0.82);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(0.6, 'rgba(0,1,5,0.25)');
+    vg.addColorStop(1,   'rgba(0,1,8,0.88)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // ── Mouse trail ──
+    for (let i = trail.length - 1; i >= 0; i--) {
+      const tr = trail[i];
+      tr.x += tr.sx; tr.y += tr.sy;
+      tr.op -= 0.025; tr.size *= 0.97; tr.rot += 0.08;
+      if (tr.op <= 0) { trail.splice(i, 1); continue; }
       ctx.save();
-      ctx.translate(t.x, t.y);
-      ctx.rotate(t.rot);
-      ctx.globalAlpha = t.op;
-      ctx.fillStyle = `rgba(${t.col},1)`;
-      ctx.font = `${t.size * 7}px serif`;
+      ctx.translate(tr.x, tr.y);
+      ctx.rotate(tr.rot);
+      ctx.globalAlpha = tr.op;
+      ctx.fillStyle = `rgba(${tr.col},1)`;
+      ctx.font = `${tr.size * 7}px serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('✦', 0, 0);
