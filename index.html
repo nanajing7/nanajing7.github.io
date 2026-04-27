@@ -78,7 +78,7 @@
       grid-column: 1 / -1;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       padding: 0 32px;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
@@ -92,7 +92,7 @@
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.3px;
     }
-    .nav-links { display: flex; gap: 44px; margin-right: 48px; }
+    .nav-links { display: flex; gap: 44px; }
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
@@ -326,6 +326,16 @@
     @keyframes fadeUp {
       to { opacity: 1; transform: translateY(0); }
     }
+    #netCanvas {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 26vw;
+      height: 44vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.82;
+    }
     @keyframes spin {
       from { transform: translate(-50%,-50%) rotate(0deg); }
       to   { transform: translate(-50%,-50%) rotate(360deg); }
@@ -335,17 +345,17 @@
 <body>
 <div id="cursor"></div>
 <canvas id="canvas"></canvas>
+<canvas id="netCanvas"></canvas>
 <div class="glow-blob one" id="blob1"></div>
 <div class="glow-blob two"></div>
 <div class="layout">
   <!-- Top bar -->
   <header class="topbar">
-    <div class="logo">Jing Luo · Personal Website</div>
     <nav class="nav-links">
-      <a href="#">About</a>
+      <a href="index.html" class="active">About</a>
       <a href="cv.html">CV</a>
-      <a href="#">Research</a>
-      <a href="#">Projects</a>
+      <a href="research.html">Research</a>
+      <a href="projects.html">Ongoing Projects</a>
       <a href="#">Contact</a>
     </nav>
   </header>
@@ -724,6 +734,291 @@
     by += (tby - by) * 0.04;
     blob1.style.transform = `translate(${bx}px, ${by}px)`;
     requestAnimationFrame(animBlob);
+  })();
+
+  // ── Fishing Net Animation ──
+  (function () {
+    const nc = document.getElementById('netCanvas');
+    const nx = nc.getContext('2d');
+    function resizeNC() { nc.width = nc.offsetWidth; nc.height = nc.offsetHeight; }
+    resizeNC();
+    window.addEventListener('resize', resizeNC);
+
+    const COLS = 12, ROWS = 10;
+
+    // Fish spawn positions [col, row, stringLen, size]
+    const FISH_DEFS = [
+      [0,  0, 38, 10], [0,  5, 46, 12], [0,  9, 40, 11],
+      [3,  9, 55, 14], [5,  0, 52, 15], [5,  9, 68, 16],
+      [8,  9, 58, 13], [11, 9, 44, 11], [11, 5, 42, 10],
+      [11, 0, 36,  9], [5,  5, 35, 10],
+    ];
+    const FISH_KEYWORDS = [
+      'Foreign Lobbying', 'Diplomacy', 'Trade & FDI',
+      'International Campaigns', 'Large Language Models', 'Neural Networks',
+      'Social Network Analysis', 'Elite Discourse', 'Political Propaganda',
+      'Leader Visit', 'International Organizations',
+    ];
+    // Dynamic fish with lifecycle (fade in → visible → fade out → respawn)
+    const fishState = FISH_DEFS.map((def, i) => ({
+      fc: def[0], fr: def[1], slen: def[2], sz: def[3],
+      keyword: FISH_KEYWORDS[i],
+      phase: Math.random() * Math.PI * 2,
+      spawnAt: i * 0.45,
+      lifespan: 9 + Math.random() * 6,
+      fadeIn: 1.3, fadeOut: 1.1,
+      opacity: 0,
+    }));
+
+    // Mouse tracking relative to net canvas
+    let netMx = -999, netMy = -999;
+    document.addEventListener('mousemove', e => {
+      const r = nc.getBoundingClientRect();
+      netMx = e.clientX - r.left;
+      netMy = e.clientY - r.top;
+    });
+
+    // 3D net: x=left-right, y=down(sag), z=front-back
+    const NET_W = 1.8, NET_D = 1.2, BOWL = 1.45;
+    const FOCAL = 2.4, CAM_Z = -3.8, TILT = 0.50;
+    const cosT = Math.cos(TILT), sinT = Math.sin(TILT);
+
+    function getNode3D(c, r, t) {
+      const u = c / (COLS-1), v = r / (ROWS-1);
+      const xn = (u-0.5)*2, zn = (v-0.5)*2; // -1..1
+      const x3 = xn * NET_W * 0.5;
+      const z3 = zn * NET_D * 0.5;
+      // Bowl: center sags down (y+ = down), corners at 0
+      const bowl = Math.max(0, 1 - (xn*xn + zn*zn)*0.5);
+      const y3 = BOWL * bowl;
+      // Gentle wave
+      const wx = Math.sin(t*0.72 + u*4 + v*2) * 0.032 * (0.2 + bowl);
+      const wy = Math.cos(t*0.55 + u*3 + v*2) * 0.022 * bowl;
+      const wz = Math.sin(t*0.60 + u*2 + v*3) * 0.022;
+      return { x: x3+wx, y: y3+wy, z: z3+wz };
+    }
+
+    function proj(p, W, H) {
+      // Rotate X-axis to tilt view (far edge appears higher on screen)
+      const ry = p.y * cosT - p.z * sinT;
+      const rz = p.y * sinT + p.z * cosT;
+      const s  = FOCAL / (rz - CAM_Z);
+      return {
+        x: W*0.62 + p.x * s * W * 0.42,
+        y: H*0.28 + ry  * s * H * 0.68,
+      };
+    }
+
+    function drawFish(x, y, sz, angle, alpha) {
+      nx.save();
+      nx.translate(x, y);
+      nx.rotate(angle);
+      nx.globalAlpha = alpha;
+      // Body
+      const g = nx.createLinearGradient(-sz, 0, sz, 0);
+      g.addColorStop(0,   'rgba(35,85,195,1)');
+      g.addColorStop(0.5, 'rgba(75,145,240,1)');
+      g.addColorStop(1,   'rgba(45,105,210,1)');
+      nx.beginPath();
+      nx.ellipse(0, 0, sz, sz * 0.40, 0, 0, Math.PI * 2);
+      nx.fillStyle = g;
+      nx.fill();
+      // Tail
+      nx.beginPath();
+      nx.moveTo(-sz * 0.78, 0);
+      nx.lineTo(-sz * 1.38, -sz * 0.42);
+      nx.lineTo(-sz * 1.38,  sz * 0.42);
+      nx.closePath();
+      nx.fillStyle = 'rgba(30,75,185,1)';
+      nx.fill();
+      // Dorsal fin
+      nx.beginPath();
+      nx.moveTo(-sz * 0.1, -sz * 0.40);
+      nx.quadraticCurveTo(sz * 0.15, -sz * 0.78, sz * 0.30, -sz * 0.40);
+      nx.closePath();
+      nx.fillStyle = 'rgba(65,125,230,0.85)';
+      nx.fill();
+      // Belly sheen
+      nx.beginPath();
+      nx.ellipse(sz * 0.1, sz * 0.1, sz * 0.48, sz * 0.16, 0, 0, Math.PI * 2);
+      nx.fillStyle = 'rgba(140,205,255,0.22)';
+      nx.fill();
+      // Eye white
+      nx.beginPath();
+      nx.arc(sz * 0.50, -sz * 0.08, sz * 0.11, 0, Math.PI * 2);
+      nx.fillStyle = 'rgba(225,242,255,0.95)';
+      nx.fill();
+      // Pupil
+      nx.beginPath();
+      nx.arc(sz * 0.51, -sz * 0.08, sz * 0.06, 0, Math.PI * 2);
+      nx.fillStyle = 'rgba(10,20,55,0.9)';
+      nx.fill();
+      // Scales
+      nx.strokeStyle = 'rgba(115,175,255,0.32)';
+      nx.lineWidth = 0.55;
+      [-sz*0.12, sz*0.14, sz*0.38].forEach(cx => {
+        nx.beginPath();
+        nx.arc(cx, 0, sz * 0.22, Math.PI * 0.15, Math.PI * 0.85);
+        nx.stroke();
+      });
+      nx.globalAlpha = 1;
+      nx.restore();
+    }
+
+    function drawKeyword(x, y, text, alpha) {
+      nx.save();
+      nx.font = 'bold 11px system-ui, sans-serif';
+      const tw = nx.measureText(text).width;
+      const pad = 9, bh = 22, bw = tw + pad * 2;
+      const bx = x - bw / 2, by = y - 48;
+      nx.globalAlpha = alpha;
+      // Pill background
+      nx.fillStyle = 'rgba(5,15,45,0.88)';
+      nx.beginPath();
+      nx.moveTo(bx + 11, by);
+      nx.lineTo(bx + bw - 11, by);
+      nx.quadraticCurveTo(bx + bw, by, bx + bw, by + 11);
+      nx.lineTo(bx + bw, by + bh - 11);
+      nx.quadraticCurveTo(bx + bw, by + bh, bx + bw - 11, by + bh);
+      nx.lineTo(bx + 11, by + bh);
+      nx.quadraticCurveTo(bx, by + bh, bx, by + bh - 11);
+      nx.lineTo(bx, by + 11);
+      nx.quadraticCurveTo(bx, by, bx + 11, by);
+      nx.closePath();
+      nx.fill();
+      // Border glow
+      nx.strokeStyle = 'rgba(77,163,255,0.7)';
+      nx.lineWidth = 1;
+      nx.stroke();
+      // Text
+      nx.fillStyle = '#7dc8ff';
+      nx.textAlign = 'center';
+      nx.textBaseline = 'middle';
+      nx.fillText(text, x, by + bh / 2);
+      // Connector dot
+      nx.beginPath();
+      nx.arc(x, y - 28, 2, 0, Math.PI * 2);
+      nx.fillStyle = 'rgba(77,163,255,0.6)';
+      nx.fill();
+      nx.restore();
+    }
+
+    (function loopNet() {
+      nx.clearRect(0, 0, nc.width, nc.height);
+      const t = performance.now() * 0.001;
+      const W = nc.width, H = nc.height;
+
+      // Pre-project all nodes
+      const pts = [];
+      for (let r = 0; r < ROWS; r++) {
+        pts[r] = [];
+        for (let c = 0; c < COLS; c++) {
+          pts[r][c] = proj(getNode3D(c, r, t), W, H);
+        }
+      }
+
+      // Two hanging ropes from top of canvas
+      const rope1 = pts[0][Math.floor(COLS * 0.33)];
+      const rope2 = pts[0][Math.floor(COLS * 0.67)];
+      [rope1, rope2].forEach(ap => {
+        nx.beginPath();
+        nx.moveTo(ap.x, 0);
+        nx.lineTo(ap.x, ap.y);
+        nx.strokeStyle = 'rgba(110,185,255,0.22)';
+        nx.lineWidth = 0.7;
+        nx.stroke();
+      });
+
+      // Depth lines (front→back), back-to-front for depth order
+      for (let c = 0; c < COLS; c++) {
+        nx.beginPath();
+        for (let r = 0; r < ROWS; r++) {
+          const p = pts[r][c];
+          r === 0 ? nx.moveTo(p.x, p.y) : nx.lineTo(p.x, p.y);
+        }
+        nx.strokeStyle = 'rgba(110,185,255,0.16)';
+        nx.lineWidth = 0.7;
+        nx.stroke();
+      }
+
+      // Horizontal lines, drawn back-to-front
+      for (let r = ROWS-1; r >= 0; r--) {
+        nx.beginPath();
+        for (let c = 0; c < COLS; c++) {
+          const p = pts[r][c];
+          c === 0 ? nx.moveTo(p.x, p.y) : nx.lineTo(p.x, p.y);
+        }
+        const a = 0.11 + (1 - r/(ROWS-1)) * 0.22;
+        nx.strokeStyle = `rgba(110,185,255,${a})`;
+        nx.lineWidth = 0.7;
+        nx.stroke();
+      }
+
+      // Fish with lifecycle
+      fishState.forEach(f => {
+        const age = t - f.spawnAt;
+        if (age < 0) return;
+
+        // Compute opacity based on lifecycle
+        let op;
+        if (age < f.fadeIn) {
+          op = age / f.fadeIn;                          // fade in
+        } else if (age > f.lifespan - f.fadeOut) {
+          op = Math.max(0, (f.lifespan - age) / f.fadeOut); // fade out
+        } else {
+          op = 1;
+        }
+        f.opacity = op;
+
+        // Respawn when lifecycle ends
+        if (age >= f.lifespan) {
+          const nd = FISH_DEFS[Math.floor(Math.random() * FISH_DEFS.length)];
+          f.fc = nd[0]; f.fr = nd[1]; f.slen = nd[2]; f.sz = nd[3];
+          f.phase    = Math.random() * Math.PI * 2;
+          f.spawnAt  = t + Math.random() * 1.5;
+          f.lifespan = 9 + Math.random() * 6;
+          return;
+        }
+
+        if (op <= 0) return;
+        const anchor = pts[f.fr][f.fc];
+        const swing  = Math.sin(t * 1.1 + f.phase) * 0.18;
+        const fx = anchor.x + Math.sin(swing) * f.slen;
+        const fy = anchor.y + Math.cos(swing) * f.slen;
+
+        const hovered = Math.hypot(fx - netMx, fy - netMy) < 32;
+
+        // Glow aura on hover
+        if (hovered) {
+          const glow = nx.createRadialGradient(fx, fy, 0, fx, fy, f.sz * 5);
+          glow.addColorStop(0, `rgba(100,200,255,${0.55 * op})`);
+          glow.addColorStop(1, 'rgba(0,0,0,0)');
+          nx.beginPath();
+          nx.arc(fx, fy, f.sz * 5, 0, Math.PI * 2);
+          nx.fillStyle = glow;
+          nx.fill();
+        }
+
+        // String
+        nx.beginPath();
+        nx.moveTo(anchor.x, anchor.y);
+        nx.quadraticCurveTo(
+          (anchor.x + fx) / 2 + Math.sin(t*0.9 + f.phase) * 3,
+          (anchor.y + fy) / 2, fx, fy
+        );
+        nx.strokeStyle = `rgba(95,155,220,${0.32 * op})`;
+        nx.lineWidth = 0.55;
+        nx.stroke();
+
+        const baseAlpha = op * (0.70 + 0.15 * Math.sin(t*1.4 + f.phase));
+        drawFish(fx, fy, f.sz, Math.PI/2 + swing, hovered ? Math.min(1, baseAlpha * 1.5) : baseAlpha);
+
+        // Keyword label on hover
+        if (hovered && op > 0.3) drawKeyword(fx, fy, f.keyword, op);
+      });
+
+      requestAnimationFrame(loopNet);
+    })();
   })();
 
   // ── Magnetic buttons ──

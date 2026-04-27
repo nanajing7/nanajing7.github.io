@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KPY5WHG3ET"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KPY5WHG3ET');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ongoing Projects — Jing Luo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #00020a;
+      --accent: #1a65d6;
+      --accent2: #0aa0b8;
+      --text: #d6e8ff;
+      --muted: #5a80a8;
+      --border: rgba(43,124,247,0.12);
+      --card-bg: rgba(255,255,255,0.03);
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      cursor: none;
+    }
+    #cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: width 0.25s, height 0.25s, background 0.25s;
+    }
+    body:has(a:hover) #cursor,
+    body:has(button:hover) #cursor { width: 18px; height: 18px; background: var(--accent2); }
+    #canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .glow-blob.one { width: 600px; height: 600px; background: #0d1a4a; top: -200px; left: -200px; }
+    .glow-blob.two { width: 500px; height: 500px; background: #1a0a3a; bottom: -200px; right: -200px; }
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(3,8,15,0.7);
+    }
+    .nav-links { display: flex; gap: 44px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1rem;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+      cursor: none;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .main {
+      flex: 1;
+      padding: 48px 120px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .section-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .paper-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .paper-card {
+      padding: 22px 28px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    }
+    .paper-card:hover {
+      border-color: rgba(43,124,247,0.35);
+      box-shadow: 0 0 28px rgba(43,124,247,0.12);
+      transform: translateY(-2px);
+    }
+    .paper-title {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+    .paper-authors {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .paper-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      border: 1px solid rgba(10,160,184,0.35);
+      border-radius: 20px;
+      padding: 2px 9px;
+      margin-left: 8px;
+      vertical-align: middle;
+      letter-spacing: 0.3px;
+    }
+    .fade { opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s ease forwards; }
+    .fade:nth-child(1) { animation-delay: 0.1s; }
+    .fade:nth-child(2) { animation-delay: 0.2s; }
+    .fade:nth-child(3) { animation-delay: 0.3s; }
+    .fade:nth-child(4) { animation-delay: 0.4s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    #netCanvas {
+      position: fixed;
+      top: 0; right: 0;
+      width: 26vw; height: 44vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.82;
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<canvas id="canvas"></canvas>
+<canvas id="netCanvas"></canvas>
+<div class="glow-blob one" id="blob1"></div>
+<div class="glow-blob two"></div>
+<div class="layout">
+  <header class="topbar">
+    <nav class="nav-links">
+      <a href="index.html">About</a>
+      <a href="cv.html">CV</a>
+      <a href="research.html">Research</a>
+      <a href="projects.html" class="active">Ongoing Projects</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="section-label">Research In Progress (selected)</div>
+    <div class="paper-list">
+      <div class="paper-card fade">
+        <div class="paper-title">"Foreign Influence in the United States: Lobbying versus Diplomacy." <span class="paper-tag">Book Project</span></div>
+      </div>
+      <div class="paper-card fade">
+        <div class="paper-title">"Image-as-data: Conflict Intervention in the Shadow of Great Power Competition."</div>
+      </div>
+      <div class="paper-card fade">
+        <div class="paper-title">"The Effectiveness of AI-Powered Propaganda: Evidence from China and U.S."</div>
+        <div class="paper-authors">with Haifeng Huang</div>
+      </div>
+      <div class="paper-card fade">
+        <div class="paper-title">"Copyright as Authoritarian Repression."</div>
+        <div class="paper-authors">with Jared Edgerton and Jack Wippell</div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  // ── Custom Cursor ──
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  // ── Cosmic canvas ──
+  const canvas = document.getElementById('canvas');
+  const ctx    = canvas.getContext('2d');
+  const NEBULA_DEF = [
+    { rx: 0.18, ry: 0.28, r: 460, col: '80,25,160',  op: 0.18 },
+    { rx: 0.72, ry: 0.62, r: 520, col: '10,50,130',  op: 0.20 },
+    { rx: 0.50, ry: 0.10, r: 340, col: '15,100,170', op: 0.14 },
+    { rx: 0.88, ry: 0.18, r: 360, col: '110,20,110', op: 0.12 },
+    { rx: 0.08, ry: 0.82, r: 340, col: '10,80,120',  op: 0.13 },
+    { rx: 0.55, ry: 0.85, r: 400, col: '60,12,120',  op: 0.11 },
+    { rx: 0.35, ry: 0.55, r: 300, col: '5,30,80',    op: 0.09 },
+  ];
+  const LAYER_DEF = [
+    { n: 240, minS: 0.08, maxS: 0.35, minO: 0.06, maxO: 0.30, px: 0.0008 },
+    { n: 160, minS: 0.28, maxS: 0.75, minO: 0.18, maxO: 0.55, px: 0.003  },
+    { n:  80, minS: 0.65, maxS: 1.5,  minO: 0.40, maxO: 0.82, px: 0.010  },
+    { n:  22, minS: 1.8,  maxS: 3.4,  minO: 0.72, maxO: 1.0,  px: 0.024  },
+  ];
+  let layers = [], mwStars = [];
+  function initStars() {
+    layers = LAYER_DEF.map(def => ({
+      ...def,
+      stars: Array.from({ length: def.n }, () => {
+        const r = Math.random();
+        const col = r > 0.90 ? '160,205,255' : r > 0.78 ? '255,240,190' : r > 0.70 ? '255,200,170' : '245,248,255';
+        return {
+          x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+          size: def.minS + Math.random() * (def.maxS - def.minS),
+          baseOp: def.minO + Math.random() * (def.maxO - def.minO),
+          phase: Math.random() * Math.PI * 2, twinkle: Math.random() * 1.5 + 0.2, col,
+        };
+      })
+    }));
+    mwStars = Array.from({ length: 300 }, () => {
+      const t2 = Math.random();
+      return {
+        x: t2 * canvas.width,
+        y: canvas.height * 0.15 + t2 * canvas.height * 0.7 + (Math.random()-0.5) * canvas.height * 0.35,
+        size: Math.random() * 0.5 + 0.1, op: Math.random() * 0.28 + 0.06,
+        phase: Math.random() * Math.PI * 2, twinkle: Math.random() * 0.8 + 0.1,
+      };
+    });
+  }
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; initStars(); }
+  resize(); window.addEventListener('resize', resize);
+  let mxRaw = innerWidth/2, myRaw = innerHeight/2, mxS = mxRaw, myS = myRaw;
+  document.addEventListener('mousemove', e => { mxRaw = e.clientX; myRaw = e.clientY; });
+  const shooters = [], TRAIL_COLS = ['43,124,247','13,184,212'], trail = [];
+  let shootCooldown = 160;
+  document.addEventListener('mousemove', e => {
+    for (let i = 0; i < 2; i++) trail.push({
+      x: e.clientX+(Math.random()-0.5)*8, y: e.clientY+(Math.random()-0.5)*8,
+      size: Math.random()*2+1, op: 0.85, sx: (Math.random()-0.5)*1.8,
+      sy: (Math.random()-0.5)*1.8-0.8, col: TRAIL_COLS[Math.random()>0.5?0:1],
+      rot: Math.random()*Math.PI*2
+    });
+  });
+  function drawCross(x, y, size, op, col) {
+    const len = size * 9;
+    for (const angle of [0, Math.PI/2]) {
+      const x0=x-Math.cos(angle)*len, y0=y-Math.sin(angle)*len;
+      const x1=x+Math.cos(angle)*len, y1=y+Math.sin(angle)*len;
+      const g = ctx.createLinearGradient(x0,y0,x1,y1);
+      g.addColorStop(0,'rgba(255,255,255,0)');
+      g.addColorStop(0.5,`rgba(${col},${op*0.55})`);
+      g.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1);
+      ctx.strokeStyle=g; ctx.lineWidth=0.8; ctx.stroke();
+    }
+  }
+  (function animCanvas() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const t = performance.now()*0.001;
+    mxS += (mxRaw-mxS)*0.05; myS += (myRaw-myS)*0.05;
+    const cx=canvas.width/2, cy=canvas.height/2;
+    NEBULA_DEF.forEach(n => {
+      const nx2=n.rx*canvas.width+Math.sin(t*0.025+n.rx*8)*18;
+      const ny2=n.ry*canvas.height+Math.cos(t*0.018+n.ry*8)*18;
+      const g=ctx.createRadialGradient(nx2,ny2,0,nx2,ny2,n.r);
+      g.addColorStop(0,`rgba(${n.col},${n.op})`);
+      g.addColorStop(0.5,`rgba(${n.col},${n.op*0.4})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.arc(nx2,ny2,n.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+    });
+    mwStars.forEach(s => {
+      const op=s.op*(0.6+0.4*Math.sin(t*s.twinkle+s.phase));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(200,215,255,${op})`; ctx.fill();
+    });
+    layers.forEach(layer => {
+      const ox=(mxS-cx)*layer.px, oy=(myS-cy)*layer.px;
+      layer.stars.forEach(s => {
+        const op=s.baseOp*(0.55+0.45*Math.sin(t*s.twinkle+s.phase));
+        const sx=s.x+ox, sy=s.y+oy;
+        if (s.size>0.9) {
+          const gr=ctx.createRadialGradient(sx,sy,0,sx,sy,s.size*5);
+          gr.addColorStop(0,`rgba(${s.col},${op*0.35})`); gr.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.arc(sx,sy,s.size*5,0,Math.PI*2); ctx.fillStyle=gr; ctx.fill();
+        }
+        ctx.beginPath(); ctx.arc(sx,sy,s.size,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${s.col},${op})`; ctx.fill();
+        if (s.size>1.8) drawCross(sx,sy,s.size,op,s.col);
+      });
+    });
+    shootCooldown--;
+    if (shootCooldown<=0) {
+      shootCooldown=160+Math.random()*380;
+      const angle=Math.PI/5+(Math.random()-0.5)*0.4;
+      shooters.push({x:Math.random()*canvas.width*0.8,y:Math.random()*canvas.height*0.5,len:90+Math.random()*130,speed:9+Math.random()*8,op:1,angle});
+    }
+    for (let i=shooters.length-1;i>=0;i--) {
+      const s=shooters[i];
+      s.x+=Math.cos(s.angle)*s.speed; s.y+=Math.sin(s.angle)*s.speed; s.op-=0.018;
+      if (s.op<=0){shooters.splice(i,1);continue;}
+      const gx=ctx.createLinearGradient(s.x,s.y,s.x-Math.cos(s.angle)*s.len,s.y-Math.sin(s.angle)*s.len);
+      gx.addColorStop(0,`rgba(255,255,255,${s.op})`);
+      gx.addColorStop(0.25,`rgba(200,230,255,${s.op*0.7})`);
+      gx.addColorStop(1,'rgba(150,200,255,0)');
+      ctx.beginPath(); ctx.moveTo(s.x,s.y);
+      ctx.lineTo(s.x-Math.cos(s.angle)*s.len,s.y-Math.sin(s.angle)*s.len);
+      ctx.strokeStyle=gx; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(s.x,s.y,2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${s.op})`; ctx.fill();
+    }
+    const vDim=Math.max(canvas.width,canvas.height);
+    const vg=ctx.createRadialGradient(cx,cy,vDim*0.18,cx,cy,vDim*0.82);
+    vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(0.6,'rgba(0,1,5,0.25)'); vg.addColorStop(1,'rgba(0,1,8,0.88)');
+    ctx.fillStyle=vg; ctx.fillRect(0,0,canvas.width,canvas.height);
+    for (let i=trail.length-1;i>=0;i--) {
+      const tr=trail[i];
+      tr.x+=tr.sx; tr.y+=tr.sy; tr.op-=0.025; tr.size*=0.97; tr.rot+=0.08;
+      if (tr.op<=0){trail.splice(i,1);continue;}
+      ctx.save(); ctx.translate(tr.x,tr.y); ctx.rotate(tr.rot);
+      ctx.globalAlpha=tr.op; ctx.fillStyle=`rgba(${tr.col},1)`;
+      ctx.font=`${tr.size*7}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('✦',0,0); ctx.restore(); ctx.globalAlpha=1;
+    }
+    requestAnimationFrame(animCanvas);
+  })();
+
+  // ── Glow blob follows mouse ──
+  const blob1 = document.getElementById('blob1');
+  let bx=0, by=0, tbx=-150, tby=-150;
+  document.addEventListener('mousemove', e => { tbx=e.clientX-250; tby=e.clientY-250; });
+  (function animBlob() {
+    bx+=(tbx-bx)*0.04; by+=(tby-by)*0.04;
+    blob1.style.transform=`translate(${bx}px,${by}px)`;
+    requestAnimationFrame(animBlob);
+  })();
+
+  // ── Fishing Net Animation ──
+  (function () {
+    const nc = document.getElementById('netCanvas');
+    const nx = nc.getContext('2d');
+    function resizeNC() { nc.width=nc.offsetWidth; nc.height=nc.offsetHeight; }
+    resizeNC(); window.addEventListener('resize', resizeNC);
+    const COLS=12, ROWS=10;
+    const FISH_DEFS=[[0,0,38,10],[0,5,46,12],[0,9,40,11],[3,9,55,14],[5,0,52,15],[5,9,68,16],[8,9,58,13],[11,9,44,11],[11,5,42,10],[11,0,36,9],[5,5,35,10]];
+    const FISH_KEYWORDS=['Foreign Lobbying','Diplomacy','Trade & FDI','International Campaigns','Large Language Models','Neural Networks','Social Network Analysis','Elite Discourse','Political Propaganda','Leader Visit','International Organizations'];
+    const fishState=FISH_DEFS.map((def,i)=>({fc:def[0],fr:def[1],slen:def[2],sz:def[3],keyword:FISH_KEYWORDS[i],phase:Math.random()*Math.PI*2,spawnAt:i*0.45,lifespan:9+Math.random()*6,fadeIn:1.3,fadeOut:1.1,opacity:0}));
+    let netMx=-999, netMy=-999;
+    document.addEventListener('mousemove', e => { const r=nc.getBoundingClientRect(); netMx=e.clientX-r.left; netMy=e.clientY-r.top; });
+    const NET_W=1.8, NET_D=1.2, BOWL=1.45, FOCAL=2.4, CAM_Z=-3.8, TILT=0.50;
+    const cosT=Math.cos(TILT), sinT=Math.sin(TILT);
+    function getNode3D(c,r,t) {
+      const u=c/(COLS-1), v=r/(ROWS-1), xn=(u-0.5)*2, zn=(v-0.5)*2;
+      const x3=xn*NET_W*0.5, z3=zn*NET_D*0.5;
+      const bowl=Math.max(0,1-(xn*xn+zn*zn)*0.5);
+      const y3=BOWL*bowl;
+      return {x:x3+Math.sin(t*0.72+u*4+v*2)*0.032*(0.2+bowl), y:y3+Math.cos(t*0.55+u*3+v*2)*0.022*bowl, z:z3+Math.sin(t*0.60+u*2+v*3)*0.022};
+    }
+    function proj(p,W,H) {
+      const ry=p.y*cosT-p.z*sinT, rz=p.y*sinT+p.z*cosT, s=FOCAL/(rz-CAM_Z);
+      return {x:W*0.62+p.x*s*W*0.42, y:H*0.28+ry*s*H*0.68};
+    }
+    function drawFish(x,y,sz,angle,alpha) {
+      nx.save(); nx.translate(x,y); nx.rotate(angle); nx.globalAlpha=alpha;
+      const g=nx.createLinearGradient(-sz,0,sz,0);
+      g.addColorStop(0,'rgba(35,85,195,1)'); g.addColorStop(0.5,'rgba(75,145,240,1)'); g.addColorStop(1,'rgba(45,105,210,1)');
+      nx.beginPath(); nx.ellipse(0,0,sz,sz*0.40,0,0,Math.PI*2); nx.fillStyle=g; nx.fill();
+      nx.beginPath(); nx.moveTo(-sz*0.78,0); nx.lineTo(-sz*1.38,-sz*0.42); nx.lineTo(-sz*1.38,sz*0.42); nx.closePath(); nx.fillStyle='rgba(30,75,185,1)'; nx.fill();
+      nx.beginPath(); nx.moveTo(-sz*0.1,-sz*0.40); nx.quadraticCurveTo(sz*0.15,-sz*0.78,sz*0.30,-sz*0.40); nx.closePath(); nx.fillStyle='rgba(65,125,230,0.85)'; nx.fill();
+      nx.beginPath(); nx.ellipse(sz*0.1,sz*0.1,sz*0.48,sz*0.16,0,0,Math.PI*2); nx.fillStyle='rgba(140,205,255,0.22)'; nx.fill();
+      nx.beginPath(); nx.arc(sz*0.50,-sz*0.08,sz*0.11,0,Math.PI*2); nx.fillStyle='rgba(225,242,255,0.95)'; nx.fill();
+      nx.beginPath(); nx.arc(sz*0.51,-sz*0.08,sz*0.06,0,Math.PI*2); nx.fillStyle='rgba(10,20,55,0.9)'; nx.fill();
+      nx.strokeStyle='rgba(115,175,255,0.32)'; nx.lineWidth=0.55;
+      [-sz*0.12,sz*0.14,sz*0.38].forEach(cx2=>{nx.beginPath();nx.arc(cx2,0,sz*0.22,Math.PI*0.15,Math.PI*0.85);nx.stroke();});
+      nx.globalAlpha=1; nx.restore();
+    }
+    function drawKeyword(x,y,text,alpha) {
+      nx.save(); nx.font='bold 11px system-ui, sans-serif';
+      const tw=nx.measureText(text).width, pad=9, bh=22, bw=tw+pad*2, bx=x-bw/2, by=y-48;
+      nx.globalAlpha=alpha; nx.fillStyle='rgba(5,15,45,0.88)';
+      nx.beginPath(); nx.moveTo(bx+11,by); nx.lineTo(bx+bw-11,by); nx.quadraticCurveTo(bx+bw,by,bx+bw,by+11);
+      nx.lineTo(bx+bw,by+bh-11); nx.quadraticCurveTo(bx+bw,by+bh,bx+bw-11,by+bh);
+      nx.lineTo(bx+11,by+bh); nx.quadraticCurveTo(bx,by+bh,bx,by+bh-11);
+      nx.lineTo(bx,by+11); nx.quadraticCurveTo(bx,by,bx+11,by); nx.closePath(); nx.fill();
+      nx.strokeStyle='rgba(77,163,255,0.7)'; nx.lineWidth=1; nx.stroke();
+      nx.fillStyle='#7dc8ff'; nx.textAlign='center'; nx.textBaseline='middle'; nx.fillText(text,x,by+bh/2);
+      nx.beginPath(); nx.arc(x,y-28,2,0,Math.PI*2); nx.fillStyle='rgba(77,163,255,0.6)'; nx.fill();
+      nx.restore();
+    }
+    (function loopNet() {
+      nx.clearRect(0,0,nc.width,nc.height);
+      const t=performance.now()*0.001, W=nc.width, H=nc.height;
+      const pts=[];
+      for (let r=0;r<ROWS;r++){pts[r]=[];for(let c=0;c<COLS;c++)pts[r][c]=proj(getNode3D(c,r,t),W,H);}
+      [pts[0][Math.floor(COLS*0.33)],pts[0][Math.floor(COLS*0.67)]].forEach(ap=>{nx.beginPath();nx.moveTo(ap.x,0);nx.lineTo(ap.x,ap.y);nx.strokeStyle='rgba(110,185,255,0.22)';nx.lineWidth=0.7;nx.stroke();});
+      for(let c=0;c<COLS;c++){nx.beginPath();for(let r=0;r<ROWS;r++){const p=pts[r][c];r===0?nx.moveTo(p.x,p.y):nx.lineTo(p.x,p.y);}nx.strokeStyle='rgba(110,185,255,0.16)';nx.lineWidth=0.7;nx.stroke();}
+      for(let r=ROWS-1;r>=0;r--){nx.beginPath();for(let c=0;c<COLS;c++){const p=pts[r][c];c===0?nx.moveTo(p.x,p.y):nx.lineTo(p.x,p.y);}nx.strokeStyle=`rgba(110,185,255,${0.11+(1-r/(ROWS-1))*0.22})`;nx.lineWidth=0.7;nx.stroke();}
+      fishState.forEach(f=>{
+        const age=t-f.spawnAt; if(age<0)return;
+        let op; if(age<f.fadeIn)op=age/f.fadeIn; else if(age>f.lifespan-f.fadeOut)op=Math.max(0,(f.lifespan-age)/f.fadeOut); else op=1;
+        f.opacity=op;
+        if(age>=f.lifespan){const nd=FISH_DEFS[Math.floor(Math.random()*FISH_DEFS.length)];f.fc=nd[0];f.fr=nd[1];f.slen=nd[2];f.sz=nd[3];f.phase=Math.random()*Math.PI*2;f.spawnAt=t+Math.random()*1.5;f.lifespan=9+Math.random()*6;return;}
+        if(op<=0)return;
+        const anchor=pts[f.fr][f.fc], swing=Math.sin(t*1.1+f.phase)*0.18;
+        const fx=anchor.x+Math.sin(swing)*f.slen, fy=anchor.y+Math.cos(swing)*f.slen;
+        const hovered=Math.hypot(fx-netMx,fy-netMy)<32;
+        if(hovered){const glow=nx.createRadialGradient(fx,fy,0,fx,fy,f.sz*5);glow.addColorStop(0,`rgba(100,200,255,${0.55*op})`);glow.addColorStop(1,'rgba(0,0,0,0)');nx.beginPath();nx.arc(fx,fy,f.sz*5,0,Math.PI*2);nx.fillStyle=glow;nx.fill();}
+        nx.beginPath();nx.moveTo(anchor.x,anchor.y);nx.quadraticCurveTo((anchor.x+fx)/2+Math.sin(t*0.9+f.phase)*3,(anchor.y+fy)/2,fx,fy);nx.strokeStyle=`rgba(95,155,220,${0.32*op})`;nx.lineWidth=0.55;nx.stroke();
+        const baseAlpha=op*(0.70+0.15*Math.sin(t*1.4+f.phase));
+        drawFish(fx,fy,f.sz,Math.PI/2+swing,hovered?Math.min(1,baseAlpha*1.5):baseAlpha);
+        if(hovered&&op>0.3)drawKeyword(fx,fy,f.keyword,op);
+      });
+      requestAnimationFrame(loopNet);
+    })();
+  })();
+</script>
+</body>
+</html>
