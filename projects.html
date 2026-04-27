@@ -70,9 +70,10 @@
     }
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: flex-start;
-      padding: 0 32px;
+      padding: 0 32px 2px;
+      height: 56px;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
       background: rgba(3,8,15,0.7);
@@ -216,8 +217,8 @@
   const LAYER_DEF = [
     { n: 240, minS: 0.08, maxS: 0.35, minO: 0.06, maxO: 0.30, px: 0.0008 },
     { n: 160, minS: 0.28, maxS: 0.75, minO: 0.18, maxO: 0.55, px: 0.003  },
-    { n:  80, minS: 0.65, maxS: 1.5,  minO: 0.40, maxO: 0.82, px: 0.010  },
-    { n:  22, minS: 1.8,  maxS: 3.4,  minO: 0.72, maxO: 1.0,  px: 0.024  },
+    { n:  45, minS: 0.65, maxS: 1.5,  minO: 0.40, maxO: 0.82, px: 0.010  },
+    { n:  10, minS: 1.8,  maxS: 3.4,  minO: 0.72, maxO: 1.0,  px: 0.024  },
   ];
   let layers = [], mwStars = [];
   function initStars() {
