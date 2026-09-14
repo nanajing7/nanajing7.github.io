@@ -12,6 +12,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CV — Jing Luo</title>
+  <script>
+    // Apply saved theme before first paint to avoid flash
+    (function(){
+      try {
+        if (localStorage.getItem('theme') === 'light')
+          document.documentElement.setAttribute('data-theme', 'light');
+      } catch (e) { /* storage blocked — fall back to dark */ }
+    })();
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -21,7 +30,52 @@
       --text: #d6e8ff;
       --muted: #5a80a8;
       --border: rgba(43,124,247,0.12);
+      --topbar-bg: rgba(3,8,15,0.7);
+      --chip-bg: rgba(43,124,247,0.08);
+      --cursor-blend: screen;
     }
+    :root[data-theme="light"] {
+      --bg: #f7f9fc;
+      --accent: #1a5fc8;
+      --accent2: #0b7d92;
+      --text: #16222e;
+      --muted: #5c7086;
+      --border: rgba(26,95,200,0.16);
+      --topbar-bg: rgba(255,255,255,0.88);
+      --chip-bg: rgba(26,95,200,0.06);
+      --cursor-blend: normal;
+    }
+    :root[data-theme="light"] body {
+      background:
+        linear-gradient(180deg, rgba(26,95,200,0.10) 0, rgba(26,95,200,0.045) 180px, transparent 420px),
+        radial-gradient(900px 600px at 12% 8%, rgba(26,95,200,0.05), transparent 60%),
+        radial-gradient(800px 600px at 88% 82%, rgba(11,125,146,0.05), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
+    }
+    /* Header sits in the same blue wash as the page instead of a hard white bar */
+    :root[data-theme="light"] .topbar {
+      background: linear-gradient(180deg, rgba(226,238,251,0.85), rgba(238,245,252,0.55));
+      border-bottom-color: rgba(26,95,200,0.10);
+    }
+    :root[data-theme="light"] .glow-blob { display: none; }
+    :root[data-theme="light"] iframe { box-shadow: 0 2px 14px rgba(20,40,80,0.08); }
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      margin-left: auto;
+      width: 40px; height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      font-size: 0.95rem;
+      line-height: 1;
+      cursor: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); transform: translateY(-1px); }
     html, body {
       height: 100%;
       background: var(--bg);
@@ -38,7 +92,7 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      mix-blend-mode: screen;
+      mix-blend-mode: var(--cursor-blend);
       transition: width 0.25s, height 0.25s, background 0.25s;
     }
     .glow-blob {
@@ -65,11 +119,11 @@
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
-      padding: 0 32px 2px;
+      padding: 0 32px 9px;
       height: 56px;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
-      background: rgba(3,8,15,0.7);
+      background: var(--topbar-bg);
     }
     .logo {
       font-size: 1.2rem;
@@ -145,6 +199,7 @@
       <a href="projects.html">Ongoing Projects</a>
       <a href="#">Contact</a>
     </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">🌙</button>
   </header>
   <div class="pdf-wrap">
     <div class="pdf-header">
@@ -155,6 +210,19 @@
   </div>
 </div>
 <script>
+  // ── Theme toggle ──
+  const themeBtn = document.getElementById('themeToggle');
+  function isLight() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function syncThemeIcon() { themeBtn.textContent = isLight() ? '☀️' : '🌙'; }
+  function saveTheme(v) { try { localStorage.setItem('theme', v); } catch (e) { /* storage blocked */ } }
+  syncThemeIcon();
+  themeBtn.addEventListener('click', () => {
+    if (isLight()) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'light');
+    syncThemeIcon();
+    saveTheme(isLight() ? 'light' : 'dark');
+  });
+
   const cursor = document.getElementById('cursor');
   document.addEventListener('mousemove', e => {
     cursor.style.left = e.clientX + 'px';

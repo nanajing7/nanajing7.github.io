@@ -20,6 +20,15 @@
   <meta property="og:type" content="website"/>
   <link rel="canonical" href="https://nanajing7.github.io/"/>
   <title>Jing Luo — Personal Website</title>
+  <script>
+    // Apply saved theme before first paint to avoid flash
+    (function(){
+      try {
+        if (localStorage.getItem('theme') === 'light')
+          document.documentElement.setAttribute('data-theme', 'light');
+      } catch (e) { /* storage blocked — fall back to dark */ }
+    })();
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -30,7 +39,43 @@
       --muted: #5a80a8;
       --border: rgba(43,124,247,0.12);
       --card-bg: rgba(255,255,255,0.03);
+      --topbar-bg: rgba(3,8,15,0.7);
+      --link: #4da3ff;
+      --link-glow: 0 0 12px rgba(77,163,255,0.6);
+      --chip-bg: rgba(43,124,247,0.08);
+      --chip-border: rgba(77,163,255,0.25);
+      --cursor-blend: screen;
     }
+    :root[data-theme="light"] {
+      --bg: #f7f9fc;
+      --accent: #1a5fc8;
+      --accent2: #0b7d92;
+      --text: #16222e;
+      --muted: #5c7086;
+      --border: rgba(26,95,200,0.16);
+      --card-bg: rgba(255,255,255,0.85);
+      --topbar-bg: rgba(255,255,255,0.88);
+      --link: #1a5fc8;
+      --link-glow: none;
+      --chip-bg: rgba(26,95,200,0.06);
+      --chip-border: rgba(26,95,200,0.28);
+      --cursor-blend: normal;
+    }
+    :root[data-theme="light"] body {
+      background:
+        linear-gradient(180deg, rgba(26,95,200,0.10) 0, rgba(26,95,200,0.045) 180px, transparent 420px),
+        radial-gradient(900px 600px at 12% 8%, rgba(26,95,200,0.05), transparent 60%),
+        radial-gradient(800px 600px at 88% 82%, rgba(11,125,146,0.05), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
+    }
+    /* Header sits in the same blue wash as the page instead of a hard white bar */
+    :root[data-theme="light"] .topbar {
+      background: linear-gradient(180deg, rgba(226,238,251,0.85), rgba(238,245,252,0.55));
+      border-bottom-color: rgba(26,95,200,0.10);
+    }
+    :root[data-theme="light"] .glow-blob { display: none; }
+    :root[data-theme="light"] #netCanvas { display: none; }
     html, body {
       min-height: 100%;
       overflow-y: auto;
@@ -50,7 +95,7 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      mix-blend-mode: screen;
+      mix-blend-mode: var(--cursor-blend);
       transition: width 0.25s, height 0.25s, background 0.25s;
     }
     body:has(a:hover) #cursor,
@@ -91,12 +136,31 @@
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
-      padding: 0 32px 2px;
+      padding: 0 32px 9px;
       height: 56px;
       height: 56px;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
-      background: rgba(3,8,15,0.7);
+      background: var(--topbar-bg);
+    }
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      margin-left: auto;
+      width: 40px; height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      font-size: 0.95rem;
+      line-height: 1;
+      cursor: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
     }
     .logo {
       font-size: 1.2rem;
@@ -207,9 +271,9 @@
     .chip {
       padding: 4px 10px;
       border-radius: 20px;
-      background: rgba(43,124,247,0.08);
-      border: 1px solid rgba(77,163,255,0.25);
-      color: #4da3ff;
+      background: var(--chip-bg);
+      border: 1px solid var(--chip-border);
+      color: var(--link);
       font-size: 0.8rem;
       letter-spacing: 0.3px;
       text-shadow: 0 0 8px rgba(77,163,255,0.5), 0 0 18px rgba(77,163,255,0.2);
@@ -286,6 +350,7 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
       align-content: start;
+      margin-top: 34px;
     }
     .card {
       background: var(--card-bg);
@@ -321,7 +386,7 @@
     .card-link {
       display: inline-block;
       margin-top: 22px;
-      color: #4da3ff;
+      color: var(--link);
       font-size: 0.95rem;
       text-decoration: none;
       opacity: 0.8;
@@ -330,6 +395,21 @@
       cursor: none;
     }
     .card-link:hover { opacity: 1; text-shadow: 0 0 14px rgba(77,163,255,0.9), 0 0 30px rgba(77,163,255,0.5); }
+    /* ── Light-mode surface tuning ── */
+    :root[data-theme="light"] .card-link,
+    :root[data-theme="light"] .card-link:hover { text-shadow: none; font-weight: 600; }
+    :root[data-theme="light"] .card { box-shadow: 0 1px 3px rgba(20,40,80,0.06); }
+    :root[data-theme="light"] .card:hover {
+      border-color: rgba(26,95,200,0.35);
+      box-shadow: 0 10px 30px rgba(26,95,200,0.10);
+    }
+    :root[data-theme="light"] .avatar {
+      box-shadow: 0 6px 24px rgba(26,95,200,0.18);
+      border-color: rgba(26,95,200,0.25);
+    }
+    :root[data-theme="light"] .btn-outline { border-color: rgba(22,34,46,0.18); }
+    :root[data-theme="light"] .chip { text-shadow: none; box-shadow: none; }
+    :root[data-theme="light"] .ramen-link { text-shadow: none !important; }
     /* ── Fade-in ── */
     .fade { opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s ease forwards; }
     .fade:nth-child(1) { animation-delay: 0.1s; }
@@ -372,6 +452,7 @@
       <a href="projects.html">Ongoing Projects</a>
       <a href="#">Contact</a>
     </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">🌙</button>
   </header>
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -408,7 +489,7 @@
     <div class="bio-section fade">
       <h1 class="bio-title"><span class="grad">About Me</span></h1>
       <p class="bio-text">
-        Welcome! I'm a Ph.D. candidate in the Department of Political Science at the Ohio State University. My research focuses on foreign lobbying, diplomacy, and international campaigns. My research uses various computational methods, including machine learning, large language models, neural networks, and social networks. You can find my package <a href="https://github.com/nanajing7/RAMEN" target="_blank" style="color:#4da3ff;text-decoration:none;font-weight:700;border-bottom:1.5px solid rgba(77,163,255,0.5);padding-bottom:1px;text-shadow:0 0 12px rgba(77,163,255,0.6);">RAMEN</a> on GitHub.
+        Welcome! I'm a Ph.D. candidate in the Department of Political Science at the Ohio State University. My research focuses on foreign lobbying, diplomacy, and international campaigns. My research uses various computational methods, including machine learning, large language models, neural networks, and social networks. You can find my package <a href="https://github.com/nanajing7/RAMEN" target="_blank" class="ramen-link" style="color:var(--link);text-decoration:none;font-weight:700;border-bottom:1.5px solid var(--chip-border);padding-bottom:1px;text-shadow:0 0 12px rgba(77,163,255,0.6);">RAMEN</a> on GitHub.
       </p>
       <div class="bio-cta">
         <a href="#" class="btn btn-primary">View My Work</a>
@@ -465,6 +546,19 @@
   </main>
 </div>
 <script>
+  // ── Theme toggle ──
+  const themeBtn = document.getElementById('themeToggle');
+  function isLight() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function syncThemeIcon() { themeBtn.textContent = isLight() ? '☀️' : '🌙'; }
+  function saveTheme(v) { try { localStorage.setItem('theme', v); } catch (e) { /* storage blocked */ } }
+  syncThemeIcon();
+  themeBtn.addEventListener('click', () => {
+    if (isLight()) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'light');
+    syncThemeIcon();
+    saveTheme(isLight() ? 'light' : 'dark');
+  });
+
   // ── Custom Cursor ──
   const cursor = document.getElementById('cursor');
   let mx = 0, my = 0;
@@ -598,9 +692,10 @@
     myS += (myRaw - myS) * 0.05;
     const cx = canvas.width  / 2;
     const cy = canvas.height / 2;
+    const light = isLight();
 
     // ── Nebula clouds ──
-    NEBULA_DEF.forEach(n => {
+    if (!light) NEBULA_DEF.forEach(n => {
       const nx = n.rx * canvas.width  + Math.sin(t * 0.025 + n.rx * 8) * 18;
       const ny = n.ry * canvas.height + Math.cos(t * 0.018 + n.ry * 8) * 18;
       const g  = ctx.createRadialGradient(nx, ny, 0, nx, ny, n.r);
@@ -614,7 +709,7 @@
     });
 
     // ── Milky Way band ──
-    mwStars.forEach(s => {
+    if (!light) mwStars.forEach(s => {
       const op = s.op * (0.6 + 0.4 * Math.sin(t * s.twinkle + s.phase));
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
@@ -623,7 +718,7 @@
     });
 
     // ── Star layers with parallax ──
-    layers.forEach(layer => {
+    if (!light) layers.forEach(layer => {
       const ox = (mxS - cx) * layer.px;
       const oy = (myS - cy) * layer.px;
       layer.stars.forEach(s => {
@@ -652,6 +747,7 @@
     });
 
     // ── Shooting stars ──
+    if (!light) {
     shootCooldown--;
     if (shootCooldown <= 0) {
       shootCooldown = 160 + Math.random() * 380;
@@ -688,15 +784,18 @@
       ctx.fillStyle = `rgba(255,255,255,${s.op})`;
       ctx.fill();
     }
+    }
 
     // ── Vignette (telescope depth) ──
-    const vDim = Math.max(canvas.width, canvas.height);
-    const vg = ctx.createRadialGradient(cx, cy, vDim * 0.18, cx, cy, vDim * 0.82);
-    vg.addColorStop(0, 'rgba(0,0,0,0)');
-    vg.addColorStop(0.6, 'rgba(0,1,5,0.25)');
-    vg.addColorStop(1,   'rgba(0,1,8,0.88)');
-    ctx.fillStyle = vg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!light) {
+      const vDim = Math.max(canvas.width, canvas.height);
+      const vg = ctx.createRadialGradient(cx, cy, vDim * 0.18, cx, cy, vDim * 0.82);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(0.6, 'rgba(0,1,5,0.25)');
+      vg.addColorStop(1,   'rgba(0,1,8,0.88)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
     // ── Mouse trail ──
     for (let i = trail.length - 1; i >= 0; i--) {
@@ -755,6 +854,10 @@
     window.addEventListener('resize', resizeNC);
 
     const COLS = 12, ROWS = 10;
+    // Net line color adapts to theme (light background needs darker, denser lines)
+    function netCol(a) {
+      return isLight() ? `rgba(40,90,160,${Math.min(1, a * 1.8)})` : `rgba(110,185,255,${a})`;
+    }
 
     // Fish spawn positions [col, row, stringLen, size]
     const FISH_DEFS = [
@@ -882,8 +985,9 @@
       const pad = 9, bh = 22, bw = tw + pad * 2;
       const bx = x - bw / 2, by = y - 48;
       nx.globalAlpha = alpha;
+      const lightMode = isLight();
       // Pill background
-      nx.fillStyle = 'rgba(5,15,45,0.88)';
+      nx.fillStyle = lightMode ? 'rgba(255,255,255,0.95)' : 'rgba(5,15,45,0.88)';
       nx.beginPath();
       nx.moveTo(bx + 11, by);
       nx.lineTo(bx + bw - 11, by);
@@ -897,24 +1001,26 @@
       nx.closePath();
       nx.fill();
       // Border glow
-      nx.strokeStyle = 'rgba(77,163,255,0.7)';
+      nx.strokeStyle = lightMode ? 'rgba(26,95,200,0.55)' : 'rgba(77,163,255,0.7)';
       nx.lineWidth = 1;
       nx.stroke();
       // Text
-      nx.fillStyle = '#7dc8ff';
+      nx.fillStyle = lightMode ? '#12447f' : '#7dc8ff';
       nx.textAlign = 'center';
       nx.textBaseline = 'middle';
       nx.fillText(text, x, by + bh / 2);
       // Connector dot
       nx.beginPath();
       nx.arc(x, y - 28, 2, 0, Math.PI * 2);
-      nx.fillStyle = 'rgba(77,163,255,0.6)';
+      nx.fillStyle = lightMode ? 'rgba(26,95,200,0.6)' : 'rgba(77,163,255,0.6)';
       nx.fill();
       nx.restore();
     }
 
     (function loopNet() {
       nx.clearRect(0, 0, nc.width, nc.height);
+      // Net + fish are a dark-mode-only decoration
+      if (isLight()) { requestAnimationFrame(loopNet); return; }
       const t = performance.now() * 0.001;
       const W = nc.width, H = nc.height;
 
@@ -934,7 +1040,7 @@
         nx.beginPath();
         nx.moveTo(ap.x, 0);
         nx.lineTo(ap.x, ap.y);
-        nx.strokeStyle = 'rgba(110,185,255,0.22)';
+        nx.strokeStyle = netCol(0.22);
         nx.lineWidth = 0.7;
         nx.stroke();
       });
@@ -946,7 +1052,7 @@
           const p = pts[r][c];
           r === 0 ? nx.moveTo(p.x, p.y) : nx.lineTo(p.x, p.y);
         }
-        nx.strokeStyle = 'rgba(110,185,255,0.16)';
+        nx.strokeStyle = netCol(0.16);
         nx.lineWidth = 0.7;
         nx.stroke();
       }
@@ -959,7 +1065,7 @@
           c === 0 ? nx.moveTo(p.x, p.y) : nx.lineTo(p.x, p.y);
         }
         const a = 0.11 + (1 - r/(ROWS-1)) * 0.22;
-        nx.strokeStyle = `rgba(110,185,255,${a})`;
+        nx.strokeStyle = netCol(a);
         nx.lineWidth = 0.7;
         nx.stroke();
       }
@@ -1016,7 +1122,7 @@
           (anchor.x + fx) / 2 + Math.sin(t*0.9 + f.phase) * 3,
           (anchor.y + fy) / 2, fx, fy
         );
-        nx.strokeStyle = `rgba(95,155,220,${0.32 * op})`;
+        nx.strokeStyle = isLight() ? `rgba(45,95,165,${0.5 * op})` : `rgba(95,155,220,${0.32 * op})`;
         nx.lineWidth = 0.55;
         nx.stroke();
 
