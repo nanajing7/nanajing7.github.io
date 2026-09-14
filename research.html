@@ -22,10 +22,10 @@
   <script>
     // Apply saved theme before first paint to avoid flash
     (function(){
-      try {
-        if (localStorage.getItem('theme') === 'light')
-          document.documentElement.setAttribute('data-theme', 'light');
-      } catch (e) { /* storage blocked — fall back to dark */ }
+      // Light is the default; dark only if the visitor chose it
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) { /* storage blocked */ }
+      if (t !== 'dark') document.documentElement.setAttribute('data-theme', 'light');
     })();
   </script>
   <style>
