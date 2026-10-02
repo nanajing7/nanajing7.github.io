@@ -217,6 +217,17 @@
       user-select: none;
     }
     .abstract-toggle:hover { opacity: 0.7; }
+    /* Matches .abstract-toggle so bracket actions read as one set */
+    .paper-link {
+      font-size: 0.88rem;
+      color: var(--accent2);
+      cursor: none;
+      display: inline-block;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .paper-link:hover { opacity: 0.7; }
     .abstract-body {
       display: none;
       margin-top: 12px;
@@ -263,8 +274,8 @@
     <div class="section-label">Under Review</div>
     <div class="paper-list">
       <div class="paper-card fade">
-        <div class="paper-title">"Modeling Bipartite Dynamic Networks: An Additive and Multiplicative Effects Model." <span class="abstract-toggle" onclick="var b=this.closest('.paper-card').querySelector('.abstract-body');b.classList.toggle('open');this.textContent=b.classList.contains('open')?'[hide abstract]':'[abstract]'">[abstract]</span> <span style="font-size:0.82rem;color:var(--muted);font-weight:400;">with software: <a href="https://github.com/nanajing7/RAMEN" target="_blank" style="color:var(--accent2);text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">RAMEN</a></span></div>
-        <div class="abstract-body">Researchers frequently study interactions between two distinct types of actors, naturally represented as bipartite networks. However, the existing additive and multiplicative effects (AME) framework does not accommodate bipartite data, leading to biased inference under standard dyadic regression models. This article advances the AME framework in three ways. First, I extend the model to bipartite networks. Second, I incorporate temporal dependence to capture the dynamic evolution of such networks. Third, I introduce a computationally efficient estimator based on penalized alternating least squares, replacing the original Markov Chain Monte Carlo-based approach. Using simulations and an application to global production networks, I show that the model improves coefficient estimation, more accurately recovers the data-generating process, and scales efficiently to large and complex networks. The empirical application further demonstrates its ability to uncover substantively meaningful patterns of economic relationships. I provide a R package, RAMEN, to facilitate implementation.</div>
+        <div class="paper-title">"Modeling Bipartite Dynamic Networks: An Additive and Multiplicative Effects Model." <span class="abstract-toggle" onclick="var b=this.closest('.paper-card').querySelector('.abstract-body');b.classList.toggle('open');this.textContent=b.classList.contains('open')?'[hide abstract]':'[abstract]'">[abstract]</span> <a href="https://arxiv.org/abs/2610.00900" target="_blank" rel="noopener" class="paper-link">[paper]</a> <span style="font-size:0.82rem;color:var(--muted);font-weight:400;">with software: <a href="https://github.com/nanajing7/RAMEN" target="_blank" style="color:var(--accent2);text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">RAMEN</a></span></div>
+        <div class="abstract-body">Researchers frequently study interactions between two distinct types of actors, represented as bipartite networks. These networks exhibit dependence patterns that differ from those in one-mode networks and therefore require models tailored to their structure. This paper develops an additive and multiplicative effects (AME) framework for longitudinal bipartite data. First, I distinguish the dependence structure and specify the corresponding modeling assumptions. Second, I introduce the bipartite dynamic AME model and develop an estimation procedure based on block coordinate descent. Third, I incorporate a squared iterative method to improve computational efficiency. Using simulations and an application to global production networks, I show that the model improves coefficient estimation, more accurately recovers the data-generating process, and better captures the multiplicative latent structure. The model reveals evolving patterns in countries’ global production engagement that are not captured by observed covariates or static specifications. I provide an R package, RAMEN, to facilitate implementation.</div>
       </div>
       <div class="paper-card fade">
         <div class="paper-title">"Strategies of Foreign Influence: Lobbying and Grassroots Diplomacy." <span class="abstract-toggle" onclick="var b=this.closest('.paper-card').querySelector('.abstract-body');b.classList.toggle('open');this.textContent=b.classList.contains('open')?'[hide abstract]':'[abstract]'">[abstract]</span></div>
